@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ueransim-gnb
+  namespace: open5gs
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ueransim-gnb
+  template:
+    metadata:
+      labels:
+        app: ueransim-gnb
+    spec:
+      containers:
+      - name: gnb
+        image: ueransim:latest
+        imagePullPolicy: Never
+        env:
+          - name: POD_IP
+            valueFrom:
+              fieldRef: { fieldPath: status.podIP }
+        command: ["/bin/sh", "-c"]
+        args:
+          - |
+            cp /etc/ueransim/gnb.yaml /tmp/gnb.yaml
+            sed -i "s/POD_IP/${POD_IP}/g" /tmp/gnb.yaml
+            exec /usr/local/bin/nr-gnb -c /tmp/gnb.yaml
+        securityContext:
+          privileged: true
+          capabilities:
+            add:
+            - NET_ADMIN
+        volumeMounts:
+        - name: config
+          mountPath: /etc/ueransim
+      volumes:
+      - name: config
+        configMap:
+          name: gnb-config

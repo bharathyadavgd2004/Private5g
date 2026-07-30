@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: open5gs-ausf
+  namespace: open5gs
+
+spec:
+  selector:
+    app: open5gs-ausf
+
+  ports:
+    - protocol: TCP
+      port: 7777
+      targetPort: 7777

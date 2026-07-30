@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ausf-config
+  namespace: open5gs
+
+data:
+  ausf.yaml: |
+    logger:
+      level: info
+
+    ausf:
+      sbi:
+        server:
+          - address: POD_IP
+            port: 7777
+
+        client:
+          scp:
+            - uri: http://open5gs-scp:7777

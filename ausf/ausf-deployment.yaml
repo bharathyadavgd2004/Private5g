@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: open5gs-ausf
+  namespace: open5gs
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: open5gs-ausf
+
+  template:
+    metadata:
+      labels:
+        app: open5gs-ausf
+
+    spec:
+      initContainers:
+        - name: wait-scp
+          image: busybox:1.36
+          command:
+            - sh
+            - -c
+            - |
+              until nc -z open5gs-scp 7777; do
+                echo "Waiting for SCP..."
+                sleep 2
+              done
+
+      containers:
+        - name: ausf
+          image: open5gs:v2.8.0
+          imagePullPolicy: Never
+
+          env:
+            - name: POD_IP
+              valueFrom:
+                fieldRef: { fieldPath: status.podIP }
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              cp /etc/open5gs/ausf.yaml /tmp/ausf.yaml
+              sed -i "s/address: POD_IP/address: ${POD_IP}/g" /tmp/ausf.yaml
+              exec /opt/open5gs/bin/open5gs-ausfd -c /tmp/ausf.yaml
+          ports:
+            - containerPort: 7777
+
+          volumeMounts:
+            - name: config
+              mountPath: /etc/open5gs
+
+      volumes:
+        - name: config
+          configMap:
+            name: ausf-config

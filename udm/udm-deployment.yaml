@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: open5gs-udm
+  namespace: open5gs
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: open5gs-udm
+
+  template:
+    metadata:
+      labels:
+        app: open5gs-udm
+
+    spec:
+      initContainers:
+        - name: wait-udr
+          image: busybox:1.36
+          command:
+            - sh
+            - -c
+            - |
+              until nc -z open5gs-udr 7777; do
+                echo "Waiting for UDR..."
+                sleep 2
+              done
+
+      containers:
+        - name: udm
+          image: open5gs:v2.8.0
+          imagePullPolicy: Never
+
+          env:
+            - name: POD_IP
+              valueFrom:
+                fieldRef: { fieldPath: status.podIP }
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              cp /etc/open5gs/udm.yaml /tmp/udm.yaml
+              sed -i "s/address: POD_IP/address: ${POD_IP}/g" /tmp/udm.yaml
+              exec /opt/open5gs/bin/open5gs-udmd -c /tmp/udm.yaml
+
+          ports:
+            - containerPort: 7777
+
+          volumeMounts:
+            - name: config
+              mountPath: /etc/open5gs
+
+      volumes:
+        - name: config
+          configMap:
+            name: udm-config

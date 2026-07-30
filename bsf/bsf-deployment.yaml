@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: open5gs-bsf
+  namespace: open5gs
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: open5gs-bsf
+
+  template:
+    metadata:
+      labels:
+        app: open5gs-bsf
+
+    spec:
+      initContainers:
+      - name: wait-nrf
+        image: busybox:1.36
+        command:
+        - sh
+        - -c
+        - |
+          until nc -z open5gs-nrf 7777; do
+            echo "Waiting for NRF..."
+            sleep 2
+          done
+
+      - name: wait-scp
+        image: busybox:1.36
+        command:
+        - sh
+        - -c
+        - |
+          until nc -z open5gs-scp 7777; do
+            echo "Waiting for SCP..."
+            sleep 2
+          done
+
+      containers:
+      - name: bsf
+        image: open5gs:v2.8.0
+        imagePullPolicy: Never
+        env:
+            - name: POD_IP
+              valueFrom:
+                fieldRef: { fieldPath: status.podIP }
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              cp /etc/open5gs/bsf.yaml /tmp/bsf.yaml
+              sed -i "s/address: POD_IP/address: ${POD_IP}/g" /tmp/bsf.yaml
+              exec /opt/open5gs/bin/open5gs-bsfd -c /tmp/bsf.yaml
+        ports:
+        - containerPort: 7777
+
+        volumeMounts:
+        - name: config
+          mountPath: /etc/open5gs
+
+      volumes:
+      - name: config
+        configMap:
+          name: bsf-config

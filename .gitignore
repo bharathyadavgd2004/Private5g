@@ -1,0 +1,14 @@
+*.log
+*.swp
+*.tmp
+.DS_Store
+
+.git/
+
+.vscode/
+.idea/
+
+docs/*.pdf
+
+*.tar
+*.gz

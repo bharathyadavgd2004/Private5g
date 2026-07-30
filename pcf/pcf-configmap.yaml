@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pcf-config
+  namespace: open5gs
+
+data:
+  pcf.yaml: |
+    logger:
+      level: info
+
+    db_uri: mongodb://mongodb/open5gs
+
+    pcf:
+      sbi:
+        server:
+          - address: POD_IP
+            port: 7777
+
+        client:
+          scp:
+            - uri: http://open5gs-scp:7777

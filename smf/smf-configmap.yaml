@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: smf-config
+  namespace: open5gs
+data:
+  smf.yaml: |
+    logger:
+      level: info
+    smf:
+      sbi:
+        server:
+          - address: POD_IP
+            port: 7777
+        client:
+          scp:
+            - uri: http://open5gs-scp:7777
+      pfcp:
+        server:
+          - address: POD_IP
+        client:
+          upf:
+            - address: open5gs-upf
+      gtpc:
+        server:
+          - address: POD_IP
+      gtpu:
+        server:
+          - address: POD_IP
+      dns:
+        - 8.8.8.8
+        - 8.8.4.4
+      mtu: 1400
+      session:
+        - subnet: 10.45.0.0/16
+          gateway: 10.45.0.1
