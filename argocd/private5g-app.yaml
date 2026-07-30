@@ -3,23 +3,20 @@ kind: Application
 metadata:
   name: private5g
   namespace: argocd
-
 spec:
   project: default
-
   source:
     repoURL: https://github.com/bharathyadavgd2004/Private5g.git
     targetRevision: main
     path: .
-
+    directory:
+      recurse: true
   destination:
     server: https://kubernetes.default.svc
     namespace: open5gs
-
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
-
     syncOptions:
       - CreateNamespace=true
