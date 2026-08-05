@@ -2,16 +2,18 @@ name: Build and Push Images
 
 on:
   push:
-    branches: [main]
+    branches: [ main ]
     paths:
-      - 'Dockerfile.open5gs'
-      - 'Dockerfile.ueransim'
+      - 'open5gs/**'
+      - 'ueransim/**'
+      - 'webui/**'
       - '.github/workflows/build.yml'
   workflow_dispatch:
 
 jobs:
   build-open5gs:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
 
@@ -21,16 +23,43 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and push open5gs image
-        uses: docker/build-push-action@v5
+      - name: Build and Push Open5GS
+        uses: docker/build-push-action@v6
         with:
-          context: .
-          file: Dockerfile.open5gs
+          context: ./open5gs
+          file: ./open5gs/Dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/open5gs:v2.8.0
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/open5gs:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/open5gs:v2.8.0
 
   build-ueransim:
     runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/checkout@v4
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and Push UERANSIM
+        uses: docker/build-push-action@v6
+        with:
+          context: ./ueransim
+          file: ./ueransim/Dockerfile
+          push: true
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/ueransim:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/ueransim:v3.2.7
+
+  build-webui:
+    runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
 
@@ -40,10 +69,11 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and push ueransim image
-        uses: docker/build-push-action@v5
+      - name: Build and Push WebUI
+        uses: docker/build-push-action@v6
         with:
-          context: .
-          file: Dockerfile.ueransim
+          context: ./webui
+          file: ./webui/Dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/ueransim:v3.2.7
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/open5gs-webui:latest
