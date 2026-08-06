@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
         - name: nrf
-          image: bharathyadavgd2004/open5gs:v2.8.0
+          image: <bharathmca>/open5gs:v2.8.0
           imagePullPolicy: IfNotPresent
 
           command:
