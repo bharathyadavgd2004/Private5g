@@ -17,6 +17,10 @@ spec:
         app: ueransim-ue
 
     spec:
+      initContainers:
+        - name: wait-gnb
+          image: busybox:1.36
+          command: ["sh", "-c", "until nc -z ueransim-gnb 38412; do echo waiting for gNB...; sleep 2; done"]
       containers:
       - name: ue
         image: ueransim:latest
