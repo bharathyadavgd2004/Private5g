@@ -78,7 +78,7 @@ something failed was most of the actual engineering work.
 | UPF PFCP source port silently rewritten | Standard `ClusterIP` Service NAT rewriting UDP source port | Headless Service (`clusterIP: None`) for UPF and AMF |
 | WebUI `ErrImagePull` | `open5gs/open5gs-webui:latest` doesn't exist — no official image published | Used community image `gradiant/open5gs-webui:2.7.0` |
 | Cluster-wide instability, pods frozen 22+ hours | Minikube silently running an unsupported Kubernetes version | Pinned explicitly: `--kubernetes-version=v1.35.1` |
-
+UE pod crashed intermittently with Bad Inet address	Missing initContainer — UE could start before gNB's Service DNS was resolvable	Added wait-gnb initContainer; iterated through nc (fails on SCTP), nslookup (unreliable exit code with DNS search domains), to a working nslookup + output-grep check
 Full troubleshooting journal: [`docs/troubleshooting.md`](docs/troubleshooting.md)
 
 ## Screenshots
