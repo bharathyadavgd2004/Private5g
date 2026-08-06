@@ -19,8 +19,8 @@ spec:
     spec:
       containers:
         - name: nrf
-          image: open5gs:v2.8.0
-          imagePullPolicy: Never
+          image: bharathyadavgd2004/open5gs:v2.8.0
+          imagePullPolicy: IfNotPresent
 
           command:
             - /opt/open5gs/bin/open5gs-nrfd
