@@ -20,7 +20,7 @@ spec:
       initContainers:
         - name: wait-gnb
           image: busybox:1.36
-          command: ["sh", "-c", "until nslookup ueransim-gnb; do echo waiting for gNB DNS...; sleep 2; done"]
+          command: ["sh", "-c", "until getent hosts ueransim-gnb; do echo waiting for gNB DNS...; sleep 2; done"]
       containers:
       - name: ue
         image: ueransim:latest
