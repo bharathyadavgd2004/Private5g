@@ -24,6 +24,7 @@ spec:
         command: ["/bin/sh", "-c"]
         args:
           - |
+            until [ -n "$POD_IP" ]; do sleep 1; done
             cp /etc/ueransim/gnb.yaml /tmp/gnb.yaml
             sed -i "s/POD_IP/${POD_IP}/g" /tmp/gnb.yaml
             exec /usr/local/bin/nr-gnb -c /tmp/gnb.yaml
