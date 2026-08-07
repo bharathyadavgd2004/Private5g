@@ -49,11 +49,17 @@ spec:
             - name: POD_IP
               valueFrom:
                 fieldRef: { fieldPath: status.podIP }
+            - name: DB_URI
+              valueFrom:
+                secretKeyRef:
+                  name: mongodb-credentials
+                  key: DB_URI
           command: ["/bin/sh", "-c"]
           args:
             - |
               cp /etc/open5gs/pcf.yaml /tmp/pcf.yaml
               sed -i "s/address: POD_IP/address: ${POD_IP}/g" /tmp/pcf.yaml
+              sed -i "1i db_uri: ${DB_URI}" /tmp/pcf.yaml
               exec /opt/open5gs/bin/open5gs-pcfd -c /tmp/pcf.yaml
           ports:
             - containerPort: 7777

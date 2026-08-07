@@ -49,11 +49,17 @@ spec:
             - name: POD_IP
               valueFrom:
                 fieldRef: { fieldPath: status.podIP }
+            - name: DB_URI
+              valueFrom:
+                secretKeyRef:
+                  name: mongodb-credentials
+                  key: DB_URI
           command: ["/bin/sh", "-c"]
           args:
             - |
               cp /etc/open5gs/udr.yaml /tmp/udr.yaml
               sed -i "s/address: POD_IP/address: ${POD_IP}/g" /tmp/udr.yaml
+              sed -i "1i db_uri: ${DB_URI}" /tmp/udr.yaml 
               exec /opt/open5gs/bin/open5gs-udrd -c /tmp/udr.yaml
           ports:
             - containerPort: 7777
